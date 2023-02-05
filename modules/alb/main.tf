@@ -38,6 +38,37 @@ resource "aws_alb_listener" "http" {
   }
 }
 
+resource "aws_alb_listener" "http" {
+  load_balancer_arn = aws_alb.alb.id
+  port              = "80"
+  protocol          = "HTTP"
+  default_action {
+    type = "redirect"
+    port = "443"
+    protocol = "HTTPS"
+    status_code = "301"
+  }
+}
+
+
+
+
+
+resource "aws_alb_listener" "https" {
+  load_balancer_arn = aws_alb.alb.id
+  port = "443"
+  protocol = "HTTPS"
+  certificate_arn = "arn:aws:acm:ap-south-1:946654525410:certificate/eefd9f46-96ca-4d6d-ab62-739ef9af1b49"
+  # load_balancer_arn = aws_alb.alb.id
+
+  default_action {
+    target_group_arn = aws_alb_target_group.default.id
+    type = "forward"
+
+  }
+  
+}
+
 resource "aws_security_group" "alb" {
   name   = "${var.alb_name}_alb"
   vpc_id = var.vpc_id
